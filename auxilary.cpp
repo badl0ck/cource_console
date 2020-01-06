@@ -37,7 +37,7 @@ int perElementFunc(const Task tsk)
         return 0;
     }
 
-Auxilary::Auxilary()
+Auxilary::Auxilary() : QObject()
 {
 
 }
@@ -116,7 +116,7 @@ void Auxilary::startRunning()
         future = QtConcurrent::mapped(tasks, perElementFunc);
         watcher->setFuture(future);
 
-        printf("%d %d %d", future.progressMinimum(), future.progressValue(), future.progressMaximum());
+        printf("%d %d %d\n", future.progressMinimum(), future.progressValue(), future.progressMaximum());
     }
     else
     {

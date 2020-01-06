@@ -1,4 +1,4 @@
-QT -= core concurrent
+QT += core concurrent
 
 CONFIG += c++11 console
 CONFIG -= app_bundle

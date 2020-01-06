@@ -15,7 +15,7 @@ struct Task
     int nElem; // количество элементов в куске
 };
 
-class Auxilary : public QWidget
+class Auxilary : public QObject
 {
     Q_OBJECT
 public:
