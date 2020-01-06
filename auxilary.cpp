@@ -7,33 +7,31 @@ using namespace std;
 
 int perElementFunc(const Task tsk)
     {
-        /*СОРТИРОВКА ДВУМЕРНОГО МАССИВА*/
-        int temp = 0;
-           for (int m = 0; m < (tsk.endIndex - tsk.beginIndex + 1) * tsk.nElem - 1; m++)   //сдвиги очередных элементов в правильную позицию
-               /*сдвиг элемента массива в правильную позицию*/
-               for (int i = tsk.beginIndex; i <= tsk.endIndex; i++)
-               {
-                   QList<int> currentLineSorting = tsk.arr->at(i);
-                   for (int j = 0; j<tsk.nElem - 1; j++){
-                       /*АНАЛИЗ НА ПОСЛЕДНИЙ ЭЛЕМЕНТ МАССИВА*/
-                           if (i == tsk.endIndex && j == tsk.nElem - 1){  //Если строка последняя и справа тупик, то ничего не делаем
-                                   continue;
-                           }
-                       /*КОНЕЦ АНАЛИЗА НА ПОСЛЕДНЮЮ СТРОКУ*/
-
-                           if (currentLineSorting.at(j) > currentLineSorting.at(j+1)){ //Если элемент не на своей позиции
-                              temp = currentLineSorting.at(j);        //Обмен местами
-                              currentLineSorting.replace(j, currentLineSorting.at(j+1));
-                              currentLineSorting.replace(j+1, temp);
-
-                              QThread::msleep(1);
-                       }
-
-                       tsk.arr->replace(i, currentLineSorting);
-                  }
-               }
-          /*КОНЕЦ СОРТИРОВКИ ДВУМЕРНОГО МАССИВА*/
-
+        int i, j, swap_count = 0, cols_nmbr = 0, temp = 0;
+        for (i = tsk.beginIndex; i < tsk.endIndex+1; i++)
+        {
+            temp = 0;
+            swap_count = 0;
+            cols_nmbr = tsk.nElem;
+            QList<int> currentLineSorting = tsk.arr->at(i);
+            for (j = 0; j < cols_nmbr; j++)
+            {
+                if (j + 1 != cols_nmbr && currentLineSorting.at(j) > currentLineSorting.at(j + 1))
+                {
+                    temp = currentLineSorting.at(j);
+                    currentLineSorting.replace(j, currentLineSorting.at(j+1));
+                    currentLineSorting.replace(j+1, temp);
+                    swap_count++;
+                }
+                if (j + 1 == cols_nmbr && swap_count > 0)
+                {
+                    cols_nmbr--;
+                    swap_count = 0;
+                    j = -1;
+                }
+            }
+            tsk.arr->replace(i, currentLineSorting);
+        }
         return 0;
     }
 
@@ -115,8 +113,7 @@ void Auxilary::startRunning()
         connect(watcher, SIGNAL(finished()), this, SLOT(finished()));
         future = QtConcurrent::mapped(tasks, perElementFunc);
         watcher->setFuture(future);
-
-        printf("%d %d %d\n", future.progressMinimum(), future.progressValue(), future.progressMaximum());
+        //printf("%d %d %d\n", future.progressMinimum(), future.progressValue(), future.progressMaximum());
     }
     else
     {
@@ -131,25 +128,28 @@ void Auxilary::progressValueChanged(int v)
 
 void Auxilary::finished()
 {
+    QString outputLine = "";
+    QList<int> temp; // сортировка
+    int r = 0;
+    int swapCount = 0;
+    int size = nElem;
+    while (r < size)
+    {
+        if (r + 1 != size && arr.at(r).at(0) > arr.at(r + 1).at(0)) {
+            temp = arr.at(r);
+            arr.replace(r, arr.at(r + 1));
+            arr.replace(r + 1, temp);
+            swapCount++;
+        }
+        if (r + 1 == size && swapCount > 0) {
+            size--;
+            swapCount = 0;
+            r = 0;
+        }
+        else { r++; }
+    }
     printf("Time elapsed: %d\n", timeCheck.elapsed());
     printf("-------------------------\n");
-
-    QString outputLine = "";
-
-    QList<int> temp; // сортировка
-    for (int i = 0; i < nElem - 1; i++)
-    {
-        for (int j = 0; j < nElem - i - 1; j++)
-        {
-            if (arr.at(j).at(0) > arr.at(j + 1).at(0))
-            {
-                temp = arr.at(j);
-                arr.replace(j, arr.at(j + 1));
-                arr.replace(j + 1, temp);
-            }
-        }
-    }
-
     if (nElem < 10)
     {
         for (int i = 0; i < nElem; i++)
